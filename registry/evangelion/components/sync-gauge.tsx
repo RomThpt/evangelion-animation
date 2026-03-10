@@ -4,8 +4,8 @@ import { animate, createScope } from "animejs";
 import { cn } from "../lib/utils";
 import { useEva } from "../provider/eva-context";
 import { NumberRoll } from "../primitives/number-roll";
-import { GlowText } from "../primitives/glow-text";
-import { t, commonLabels } from "../lib/i18n";
+import { Flicker } from "../primitives/flicker";
+import { formatLabel, tDual, commonLabels } from "../lib/i18n";
 import { DURATION, EASING } from "../lib/animation-presets";
 
 export interface SyncGaugeThresholds {
@@ -36,17 +36,18 @@ export function SyncGauge({
 }: SyncGaugeProps) {
   const arcRef = useRef<SVGCircleElement>(null);
   const prevValueRef = useRef(value);
-  const containerRef = useRef<HTMLDivElement>(null);
   const { locale, reducedMotion } = useEva();
 
-  const displayLabel = label ?? t(commonLabels, "syncRate", locale);
+  const labels = tDual(commonLabels, "syncRate");
+  const displayLabel = label ?? formatLabel(labels.en, locale, labels.ja);
 
-  const radius = (size - 16) / 2;
+  const radius = (size - 20) / 2;
   const circumference = 2 * Math.PI * radius;
   const center = size / 2;
 
   const percent = Math.min(value / maxValue, 1);
-  const dashOffset = circumference * (1 - percent * 0.75); // 270-degree arc
+  const arcSpan = 0.75; // 270 degrees
+  const dashOffset = circumference * (1 - percent * arcSpan);
 
   const thresholdState = useMemo(() => {
     if (value <= thresholds.critical) return "critical";
@@ -86,18 +87,32 @@ export function SyncGauge({
     return () => scope.revert();
   }, [dashOffset, reducedMotion]);
 
+  /* tick marks around the arc */
+  const ticks = Array.from({ length: 27 }, (_, i) => {
+    const angle = (i / 26) * 270 - 225;
+    const rad = (angle * Math.PI) / 180;
+    const inner = radius - 6;
+    const outer = i % 5 === 0 ? radius + 2 : radius - 2;
+    return {
+      x1: center + inner * Math.cos(rad),
+      y1: center + inner * Math.sin(rad),
+      x2: center + outer * Math.cos(rad),
+      y2: center + outer * Math.sin(rad),
+      major: i % 5 === 0,
+    };
+  });
+
   return (
     <motion.div
-      ref={containerRef}
       className={cn("relative inline-flex flex-col items-center font-mono", className)}
       animate={
-        thresholdState === "critical"
-          ? { opacity: [1, 0.7, 1] }
+        thresholdState === "critical" && !reducedMotion
+          ? { opacity: [1, 0.6, 1] }
           : undefined
       }
       transition={
         thresholdState === "critical"
-          ? { duration: 0.5, repeat: Infinity }
+          ? { duration: 0.4, repeat: Infinity, ease: "linear" }
           : undefined
       }
     >
@@ -107,61 +122,74 @@ export function SyncGauge({
         viewBox={`0 0 ${size} ${size}`}
         className="-rotate-[225deg]"
       >
-        {/* Background arc */}
+        {/* tick marks */}
+        {ticks.map((tick, i) => (
+          <line
+            key={i}
+            x1={tick.x1}
+            y1={tick.y1}
+            x2={tick.x2}
+            y2={tick.y2}
+            stroke={tick.major ? "var(--eva-text-dim)" : "var(--eva-border)"}
+            strokeWidth={tick.major ? 1.5 : 0.5}
+          />
+        ))}
+
+        {/* background arc */}
         <circle
           cx={center}
           cy={center}
           r={radius}
           fill="none"
           stroke="var(--eva-border)"
-          strokeWidth="4"
+          strokeWidth="3"
           strokeDasharray={circumference}
-          strokeDashoffset={circumference * 0.25}
+          strokeDashoffset={circumference * (1 - arcSpan)}
           strokeLinecap="butt"
         />
-        {/* Value arc */}
+
+        {/* value arc */}
         <circle
           ref={arcRef}
           cx={center}
           cy={center}
           r={radius}
           fill="none"
-          stroke={
-            thresholdState === "critical"
-              ? "var(--eva-secondary)"
-              : "var(--eva-primary)"
-          }
-          strokeWidth="4"
+          stroke={thresholdState === "critical" ? "#ff1744" : "var(--eva-primary)"}
+          strokeWidth="3"
           strokeDasharray={circumference}
           strokeDashoffset={reducedMotion ? dashOffset : circumference}
           strokeLinecap="butt"
           style={{
-            filter: "drop-shadow(0 0 4px var(--eva-glow))",
+            filter: `drop-shadow(0 0 3px ${thresholdState === "critical" ? "rgba(255,23,68,0.8)" : "var(--eva-glow)"})`,
           }}
         />
       </svg>
 
-      {/* Center content */}
+      {/* center readout */}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <NumberRoll
-          value={value}
-          precision={1}
-          suffix="%"
-          className={cn(
-            "text-2xl",
-            thresholdState === "critical" && "text-eva-secondary",
-          )}
-        />
+        <Flicker intensity={thresholdState === "critical" ? "heavy" : "subtle"}>
+          <NumberRoll
+            value={value}
+            precision={1}
+            suffix="%"
+            className={cn(
+              "text-xl",
+              thresholdState === "critical" && "text-red-500",
+            )}
+          />
+        </Flicker>
         {pilotName && (
-          <span className="mt-1 text-xs uppercase text-eva-text-dim">
+          <span className="mt-0.5 text-[9px] uppercase tracking-[0.15em] text-[var(--eva-text-muted,var(--eva-text-dim))]">
             {pilotName}
           </span>
         )}
       </div>
 
-      <GlowText className="mt-2 text-xs uppercase tracking-widest" intensity="low">
+      {/* label below */}
+      <span className="eva-label mt-1 text-[9px]">
         {displayLabel}
-      </GlowText>
+      </span>
     </motion.div>
   );
 }

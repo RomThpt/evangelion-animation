@@ -1,57 +1,77 @@
 @import "tailwindcss";
 
-/* ───────────────────────────────────────────────
-   Evangelion UI - Theme System
-   oklch color space for perceptually uniform palettes
-   ─────────────────────────────────────────────── */
+/*
+ * EVANGELION UI THEME
+ * Inspired by NERV operational display systems
+ * CRT phosphor rendering / analog instrumentation
+ */
 
-/* NERV branding - always available */
 :root {
-  --eva-nerv: oklch(0.45 0.18 305);
-  --eva-nerv-light: oklch(0.52 0.2 305);
-  --eva-font-mono: "Share Tech Mono", "JetBrains Mono", monospace;
+  --eva-nerv: #7b1fa2;
+  --eva-nerv-light: #9c27b0;
+  --eva-nerv-dark: #4a0072;
+  --eva-font-mono: "Share Tech Mono", "JetBrains Mono", "Courier New", monospace;
   --eva-font-jp: "Noto Sans JP", sans-serif;
-  --eva-glow-spread: 8px;
-  --eva-glow-intensity: 0.6;
+  --eva-noise-opacity: 0.03;
+  --eva-scanline-opacity: 0.08;
+  --eva-crt-curve: 2px;
+  --eva-phosphor-blur: 0.4px;
 }
 
-/* NORMAL palette (green/cyan operations) */
+/* ── NORMAL ─ green CRT phosphor ───────────────── */
 [data-eva-palette="normal"] {
-  --eva-primary: oklch(0.85 0.3 145);
-  --eva-secondary: oklch(0.82 0.18 200);
-  --eva-bg: oklch(0.1 0 0);
-  --eva-surface: oklch(0.15 0 0);
-  --eva-border: oklch(0.25 0.06 145);
-  --eva-text: oklch(0.85 0.3 145);
-  --eva-text-dim: oklch(0.5 0.15 145);
-  --eva-glow: oklch(0.85 0.3 145 / var(--eva-glow-intensity));
+  --eva-primary: #00ff41;
+  --eva-primary-bright: #33ff66;
+  --eva-secondary: #00d4aa;
+  --eva-bg: #010a01;
+  --eva-surface: #061206;
+  --eva-surface-bright: #0a1f0a;
+  --eva-border: #0d3b0d;
+  --eva-border-bright: #1a5c1a;
+  --eva-text: #00ff41;
+  --eva-text-dim: #006118;
+  --eva-text-muted: #003d0f;
+  --eva-glow: rgba(0, 255, 65, 0.6);
+  --eva-glow-strong: rgba(0, 255, 65, 0.9);
+  --eva-glow-subtle: rgba(0, 255, 65, 0.15);
 }
 
-/* CAUTION palette (orange/amber) */
+/* ── CAUTION ─ amber phosphor ──────────────────── */
 [data-eva-palette="caution"] {
-  --eva-primary: oklch(0.75 0.18 70);
-  --eva-secondary: oklch(0.8 0.15 75);
-  --eva-bg: oklch(0.1 0 0);
-  --eva-surface: oklch(0.15 0.03 70);
-  --eva-border: oklch(0.3 0.06 70);
-  --eva-text: oklch(0.75 0.18 70);
-  --eva-text-dim: oklch(0.45 0.1 70);
-  --eva-glow: oklch(0.75 0.18 70 / var(--eva-glow-intensity));
+  --eva-primary: #ff9100;
+  --eva-primary-bright: #ffab40;
+  --eva-secondary: #ffd740;
+  --eva-bg: #0a0600;
+  --eva-surface: #1a0f00;
+  --eva-surface-bright: #2a1a00;
+  --eva-border: #3d2800;
+  --eva-border-bright: #5c3d00;
+  --eva-text: #ff9100;
+  --eva-text-dim: #8a4e00;
+  --eva-text-muted: #4a2a00;
+  --eva-glow: rgba(255, 145, 0, 0.6);
+  --eva-glow-strong: rgba(255, 145, 0, 0.9);
+  --eva-glow-subtle: rgba(255, 145, 0, 0.15);
 }
 
-/* EMERGENCY palette (red) */
+/* ── EMERGENCY ─ red phosphor ──────────────────── */
 [data-eva-palette="emergency"] {
-  --eva-primary: oklch(0.63 0.26 25);
-  --eva-secondary: oklch(0.68 0.2 25);
-  --eva-bg: oklch(0.1 0.02 25);
-  --eva-surface: oklch(0.15 0.04 25);
-  --eva-border: oklch(0.25 0.08 25);
-  --eva-text: oklch(0.63 0.26 25);
-  --eva-text-dim: oklch(0.4 0.12 25);
-  --eva-glow: oklch(0.63 0.26 25 / var(--eva-glow-intensity));
+  --eva-primary: #ff1744;
+  --eva-primary-bright: #ff5252;
+  --eva-secondary: #ff8a80;
+  --eva-bg: #0a0000;
+  --eva-surface: #1a0000;
+  --eva-surface-bright: #2a0505;
+  --eva-border: #3d0000;
+  --eva-border-bright: #5c0a0a;
+  --eva-text: #ff1744;
+  --eva-text-dim: #8a0b22;
+  --eva-text-muted: #4a0512;
+  --eva-glow: rgba(255, 23, 68, 0.6);
+  --eva-glow-strong: rgba(255, 23, 68, 0.9);
+  --eva-glow-subtle: rgba(255, 23, 68, 0.15);
 }
 
-/* Register custom properties with Tailwind v4 */
 @theme inline {
   --color-eva-primary: var(--eva-primary);
   --color-eva-secondary: var(--eva-secondary);
@@ -62,43 +82,155 @@
   --color-eva-text-dim: var(--eva-text-dim);
   --color-eva-nerv: var(--eva-nerv);
   --color-eva-nerv-light: var(--eva-nerv-light);
-  --font-mono: "Share Tech Mono", "JetBrains Mono", monospace;
+  --font-mono: "Share Tech Mono", "JetBrains Mono", "Courier New", monospace;
   --font-jp: "Noto Sans JP", sans-serif;
 }
 
-/* ───────────────────────────────────────────────
-   Base styles
-   ─────────────────────────────────────────────── */
+/* ── BASE ──────────────────────────────────────── */
 
 body {
   margin: 0;
-  background: var(--eva-bg, #0a0a0a);
+  background: var(--eva-bg, #010a01);
   color: var(--eva-text, #00ff41);
   font-family: var(--eva-font-mono);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  /* kill antialiasing for that CRT crispness */
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+  image-rendering: pixelated;
 }
 
-/* ───────────────────────────────────────────────
-   Utility keyframes
-   ─────────────────────────────────────────────── */
+/* ── CRT SCREEN NOISE ──────────────────────────── */
+
+@keyframes eva-noise {
+  0%, 100% { background-position: 0 0; }
+  10% { background-position: -5% -10%; }
+  20% { background-position: -15% 5%; }
+  30% { background-position: 7% -25%; }
+  40% { background-position: 20% 25%; }
+  50% { background-position: -25% 10%; }
+  60% { background-position: 15% 5%; }
+  70% { background-position: 0 15%; }
+  80% { background-position: 25% 35%; }
+  90% { background-position: -10% 10%; }
+}
+
+@keyframes eva-vhs-tracking {
+  0% { transform: translateX(0); }
+  2% { transform: translateX(-2px); }
+  4% { transform: translateX(0); }
+  42% { transform: translateX(0); }
+  44% { transform: translateX(1px); }
+  46% { transform: translateX(0); }
+  98% { transform: translateX(0); }
+  100% { transform: translateX(-1px); }
+}
+
+/* ── KEYFRAMES ─────────────────────────────────── */
 
 @keyframes eva-pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+  50% { opacity: 0.55; }
 }
 
 @keyframes eva-glow-pulse {
-  0%, 100% { text-shadow: 0 0 4px var(--eva-glow), 0 0 8px var(--eva-glow); }
-  50% { text-shadow: 0 0 8px var(--eva-glow), 0 0 16px var(--eva-glow), 0 0 24px var(--eva-glow); }
+  0%, 100% {
+    text-shadow:
+      0 0 2px var(--eva-glow),
+      0 0 6px var(--eva-glow),
+      0 0 12px var(--eva-glow-subtle);
+    filter: brightness(1);
+  }
+  50% {
+    text-shadow:
+      0 0 4px var(--eva-glow-strong),
+      0 0 12px var(--eva-glow),
+      0 0 30px var(--eva-glow-subtle),
+      0 0 50px var(--eva-glow-subtle);
+    filter: brightness(1.15);
+  }
 }
 
 @keyframes eva-breathing {
-  0%, 100% { opacity: 0.7; }
+  0%, 100% { opacity: 0.6; }
   50% { opacity: 1; }
 }
 
 @keyframes eva-border-glow {
-  0%, 100% { box-shadow: inset 0 0 4px var(--eva-glow); }
-  50% { box-shadow: inset 0 0 8px var(--eva-glow), 0 0 4px var(--eva-glow); }
+  0%, 100% { box-shadow: inset 0 0 3px var(--eva-glow-subtle), 0 0 1px var(--eva-glow-subtle); }
+  50% { box-shadow: inset 0 0 8px var(--eva-glow-subtle), 0 0 3px var(--eva-glow-subtle); }
+}
+
+@keyframes eva-blink-hard {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes eva-chromatic-shift {
+  0%, 100% { text-shadow: -0.5px 0 rgba(255,0,0,0.15), 0.5px 0 rgba(0,100,255,0.15); }
+  50% { text-shadow: -1px 0 rgba(255,0,0,0.2), 1px 0 rgba(0,100,255,0.2); }
+}
+
+@keyframes eva-interlace-flicker {
+  0% { opacity: var(--eva-scanline-opacity); }
+  50% { opacity: calc(var(--eva-scanline-opacity) * 1.5); }
+  100% { opacity: var(--eva-scanline-opacity); }
+}
+
+@keyframes scroll-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes scroll-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
+/* ── UTILITY CLASSES ───────────────────────────── */
+
+/* phosphor text rendering */
+.eva-phosphor {
+  text-shadow:
+    0 0 1px var(--eva-glow),
+    0 0 var(--eva-phosphor-blur) var(--eva-glow);
+  filter: blur(var(--eva-phosphor-blur));
+}
+
+/* tight uppercase monospace -- the Eva "look" */
+.eva-label {
+  font-family: var(--eva-font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--eva-text-dim);
+}
+
+.eva-label-jp {
+  font-family: var(--eva-font-jp);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: var(--eva-text);
+}
+
+.eva-value {
+  font-family: var(--eva-font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* angular clip for that Eva border feel */
+.eva-clip-corner {
+  clip-path: polygon(
+    8px 0%, 100% 0%, 100% calc(100% - 8px),
+    calc(100% - 8px) 100%, 0% 100%, 0% 8px
+  );
+}
+
+.eva-clip-corner-sm {
+  clip-path: polygon(
+    4px 0%, 100% 0%, 100% calc(100% - 4px),
+    calc(100% - 4px) 100%, 0% 100%, 0% 4px
+  );
 }

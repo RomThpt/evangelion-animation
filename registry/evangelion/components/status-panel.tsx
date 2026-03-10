@@ -5,12 +5,18 @@ import { cn } from "../lib/utils";
 import { useEva } from "../provider/eva-context";
 import { TypeWriter } from "../primitives/type-writer";
 import { Scanlines } from "../primitives/scanlines";
+import { Flicker } from "../primitives/flicker";
+import { formatLabel, formatBlock, tDual, commonLabels } from "../lib/i18n";
 import { DURATION, EASING } from "../lib/animation-presets";
 
 export type StatusPanelStatus = "online" | "standby" | "offline" | "error";
 
 export interface StatusPanelProps {
   title: string;
+  /** override Japanese title -- if omitted, tries commonLabels lookup */
+  titleJa?: string;
+  /** technical block code shown in header, e.g. "001" */
+  code?: string;
   status?: StatusPanelStatus;
   children?: ReactNode;
   bordered?: boolean;
@@ -20,15 +26,10 @@ export interface StatusPanelProps {
   className?: string;
 }
 
-const statusColors: Record<StatusPanelStatus, string> = {
-  online: "bg-eva-primary",
-  standby: "bg-eva-text-dim",
-  offline: "bg-eva-text-dim opacity-40",
-  error: "bg-red-500",
-};
-
 export function StatusPanel({
   title,
+  titleJa,
+  code,
   status = "online",
   children,
   bordered = true,
@@ -38,22 +39,26 @@ export function StatusPanel({
   className,
 }: StatusPanelProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
-  const borderRef = useRef<SVGRectElement>(null);
-  const { reducedMotion } = useEva();
+  const borderRef = useRef<SVGPathElement>(null);
+  const { locale, reducedMotion } = useEva();
+
+  const labels = tDual(commonLabels, title.toLowerCase());
+  const jaText = titleJa ?? labels.ja;
+  const displayTitle = formatLabel(title, locale, jaText !== title.toLowerCase() ? jaText : undefined);
 
   useEffect(() => {
     if (!borderRef.current || !bordered || reducedMotion) return;
 
-    const rect = borderRef.current;
-    const length = rect.getTotalLength();
-    rect.style.strokeDasharray = `${length}`;
-    rect.style.strokeDashoffset = `${length}`;
+    const path = borderRef.current;
+    const length = path.getTotalLength();
+    path.style.strokeDasharray = `${length}`;
+    path.style.strokeDashoffset = `${length}`;
 
-    const scope = createScope({ root: rect.closest("svg")! });
+    const scope = createScope({ root: path.closest("svg")! });
     scope.add(() => {
-      animate(rect, {
+      animate(path, {
         strokeDashoffset: [length, 0],
-        duration: DURATION.boot,
+        duration: DURATION.boot * 1.2,
         ease: EASING.structural,
       });
     });
@@ -69,29 +74,31 @@ export function StatusPanel({
         className,
       )}
     >
+      {/* angular border with clipped corners */}
       {bordered && (
         <svg
           className="pointer-events-none absolute inset-0 h-full w-full"
           aria-hidden="true"
+          preserveAspectRatio="none"
         >
-          <rect
+          <path
             ref={borderRef}
-            x="0.5"
-            y="0.5"
-            width="calc(100% - 1px)"
-            height="calc(100% - 1px)"
+            d="M8,0 L100%,0 L100%,calc(100% - 8px) L calc(100% - 8px),100% L0,100% L0,8 Z"
             fill="none"
             stroke="var(--eva-border)"
             strokeWidth="1"
+            vectorEffect="non-scaling-stroke"
           />
         </svg>
       )}
 
+      {/* header */}
       <div
         className={cn(
-          "flex items-center gap-2 border-b border-eva-border px-3 py-2",
+          "flex items-center gap-2 px-3 py-1.5",
+          "border-b border-eva-border",
           collapsible && "cursor-pointer select-none",
-          headerPosition === "left" && "border-b-0 border-r",
+          headerPosition === "left" && "flex-col border-b-0 border-r py-3",
         )}
         onClick={collapsible ? () => setIsOpen((o) => !o) : undefined}
         role={collapsible ? "button" : undefined}
@@ -107,38 +114,55 @@ export function StatusPanel({
             : undefined
         }
       >
-        <div
-          className={cn(
-            "h-2 w-2 shrink-0",
-            statusColors[status],
-            status === "online" && "animate-[eva-pulse_2s_ease-in-out_infinite]",
-            status === "error" && "animate-[eva-pulse_0.5s_steps(1)_infinite]",
-          )}
-        />
+        {/* status pip */}
+        <Flicker intensity={status === "error" ? "heavy" : "subtle"}>
+          <div
+            className={cn(
+              "h-1.5 w-1.5",
+              status === "online" && "bg-[var(--eva-primary)] shadow-[0_0_4px_var(--eva-glow)]",
+              status === "standby" && "bg-eva-text-dim",
+              status === "offline" && "bg-[var(--eva-text-muted,var(--eva-text-dim))]",
+              status === "error" && "bg-red-500 shadow-[0_0_6px_rgba(255,0,0,0.6)]",
+            )}
+          />
+        </Flicker>
+
+        {/* block code */}
+        {code && (
+          <span className="text-[9px] text-[var(--eva-text-muted,var(--eva-text-dim))]">
+            {formatBlock(code, "")}
+          </span>
+        )}
+
+        {/* title */}
         <TypeWriter
-          text={title}
-          className="text-xs uppercase tracking-wider text-eva-text-dim"
+          text={displayTitle}
+          className="eva-label text-[10px]"
+          speed={25}
           cursor={false}
+          jitter
         />
+
         {collapsible && (
-          <span className="ml-auto text-xs text-eva-text-dim">
+          <span className="ml-auto text-[9px] text-[var(--eva-text-muted,var(--eva-text-dim))]">
             {isOpen ? "[-]" : "[+]"}
           </span>
         )}
       </div>
 
+      {/* content */}
       <AnimatePresence initial={false}>
         {isOpen && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: reducedMotion ? 0 : 0.3, ease: "easeInOut" }}
+            transition={{ duration: reducedMotion ? 0 : 0.25, ease: "easeInOut" }}
             className="overflow-hidden"
           >
-            <div className="relative p-3">
+            <div className="relative p-2">
               {children}
-              <Scanlines />
+              <Scanlines intensity="subtle" />
             </div>
           </motion.div>
         )}

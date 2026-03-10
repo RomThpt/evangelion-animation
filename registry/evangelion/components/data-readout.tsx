@@ -3,13 +3,15 @@ import { animate, createScope } from "animejs";
 import { cn } from "../lib/utils";
 import { useEva } from "../provider/eva-context";
 import { NumberRoll } from "../primitives/number-roll";
-import { GlowText } from "../primitives/glow-text";
+import { Flicker } from "../primitives/flicker";
+import { formatLabel, tDual, commonLabels } from "../lib/i18n";
 import { DURATION } from "../lib/animation-presets";
 
 export type DataTrend = "up" | "down" | "stable";
 
 export interface DataReadoutProps {
   label: string;
+  labelJa?: string;
   value: number;
   unit?: string;
   precision?: number;
@@ -18,7 +20,7 @@ export interface DataReadoutProps {
   className?: string;
 }
 
-const trendArrows: Record<DataTrend, string> = {
+const trendChars: Record<DataTrend, string> = {
   up: "\u25B2",
   down: "\u25BC",
   stable: "\u25C6",
@@ -26,6 +28,7 @@ const trendArrows: Record<DataTrend, string> = {
 
 export function DataReadout({
   label,
+  labelJa,
   value,
   unit = "",
   precision = 1,
@@ -35,7 +38,11 @@ export function DataReadout({
 }: DataReadoutProps) {
   const flashRef = useRef<HTMLDivElement>(null);
   const prevValueRef = useRef(value);
-  const { reducedMotion } = useEva();
+  const { locale, reducedMotion } = useEva();
+
+  const labels = tDual(commonLabels, label.toLowerCase());
+  const ja = labelJa ?? (labels.ja !== label.toLowerCase() ? labels.ja : undefined);
+  const displayLabel = formatLabel(label, locale, ja);
 
   useEffect(() => {
     if (
@@ -53,11 +60,8 @@ export function DataReadout({
     const scope = createScope({ root: flashRef.current });
     scope.add(() => {
       animate(flashRef.current!, {
-        backgroundColor: [
-          "var(--eva-primary)",
-          "transparent",
-        ],
-        duration: DURATION.alertFlash * 2,
+        borderColor: ["var(--eva-primary)", "var(--eva-border)"],
+        duration: DURATION.alertFlash * 3,
         ease: "out(2)",
       });
     });
@@ -69,32 +73,32 @@ export function DataReadout({
     <div
       ref={flashRef}
       className={cn(
-        "inline-flex flex-col gap-0.5 border border-eva-border px-3 py-2 font-mono",
+        "inline-flex flex-col gap-0 border border-eva-border bg-[var(--eva-bg)] px-2 py-1.5 font-mono",
         className,
       )}
     >
-      <span className="text-[10px] uppercase tracking-widest text-eva-text-dim">
-        {label}
-      </span>
+      <span className="eva-label text-[8px]">{displayLabel}</span>
       <div className="flex items-baseline gap-1">
-        <NumberRoll
-          value={value}
-          precision={precision}
-          className="text-lg"
-        />
+        <Flicker intensity="subtle">
+          <NumberRoll
+            value={value}
+            precision={precision}
+            className="text-base leading-tight"
+          />
+        </Flicker>
         {unit && (
-          <span className="text-xs text-eva-text-dim">{unit}</span>
+          <span className="text-[9px] text-[var(--eva-text-muted,var(--eva-text-dim))]">{unit}</span>
         )}
-        <GlowText
+        <span
           className={cn(
-            "ml-1 text-xs transition-transform duration-300",
-            trend === "up" && "text-eva-primary",
-            trend === "down" && "text-eva-secondary",
+            "ml-0.5 text-[8px]",
+            trend === "up" && "text-[var(--eva-primary)]",
+            trend === "down" && "text-red-500",
+            trend === "stable" && "text-[var(--eva-text-muted,var(--eva-text-dim))]",
           )}
-          intensity="low"
         >
-          {trendArrows[trend]}
-        </GlowText>
+          {trendChars[trend]}
+        </span>
       </div>
     </div>
   );

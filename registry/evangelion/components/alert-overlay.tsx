@@ -5,7 +5,8 @@ import { cn } from "../lib/utils";
 import { useEva } from "../provider/eva-context";
 import { GlowText } from "../primitives/glow-text";
 import { TypeWriter } from "../primitives/type-writer";
-import { t, commonLabels } from "../lib/i18n";
+import { Flicker } from "../primitives/flicker";
+import { formatLabel, tDual, commonLabels, formatHex } from "../lib/i18n";
 import { DURATION } from "../lib/animation-presets";
 
 export type AlertLevel = "info" | "caution" | "emergency";
@@ -21,12 +22,6 @@ export interface AlertOverlayProps {
   className?: string;
 }
 
-const levelStyles: Record<AlertLevel, string> = {
-  info: "border-eva-primary",
-  caution: "border-amber-500",
-  emergency: "border-red-500",
-};
-
 export function AlertOverlay({
   level,
   message,
@@ -41,30 +36,29 @@ export function AlertOverlay({
   const { locale, reducedMotion } = useEva();
   const triggeredRef = useRef(false);
 
-  const levelLabel = t(commonLabels, level === "info" ? "info" : level, locale);
+  const labels = tDual(commonLabels, level === "info" ? "info" : level);
+  const levelText = formatLabel(labels.en, locale, labels.ja);
 
   useEffect(() => {
     if (visible && !triggeredRef.current) {
       triggeredRef.current = true;
       onAlertTrigger?.(level);
     }
-    if (!visible) {
-      triggeredRef.current = false;
-    }
+    if (!visible) triggeredRef.current = false;
   }, [visible, level, onAlertTrigger]);
 
   useEffect(() => {
     if (!contentRef.current || !visible || reducedMotion) return;
 
-    const scope = createScope({ root: contentRef.current });
     const children = contentRef.current.querySelectorAll("[data-eva-animate]");
+    const scope = createScope({ root: contentRef.current });
 
     scope.add(() => {
       animate(children, {
         opacity: [0, 1],
-        translateY: [20, 0],
+        translateY: [15, 0],
         delay: stagger(DURATION.staggerElement),
-        duration: DURATION.boot * 0.6,
+        duration: DURATION.boot * 0.5,
         ease: "out(3)",
       });
     });
@@ -76,6 +70,8 @@ export function AlertOverlay({
     if (dismissible) onDismiss?.();
   };
 
+  const alertColor = level === "emergency" ? "#ff1744" : level === "caution" ? "#ff9100" : "var(--eva-primary)";
+
   return (
     <AnimatePresence>
       {visible && (
@@ -83,131 +79,105 @@ export function AlertOverlay({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: reducedMotion ? 0 : 0.3 }}
+          transition={{ duration: reducedMotion ? 0 : 0.2 }}
           className={cn(
             "fixed inset-0 z-[100] flex items-center justify-center font-mono",
-            level === "emergency" &&
-              "animate-[eva-pulse_0.5s_steps(1)_infinite] bg-red-950/40",
-            level === "caution" && "bg-amber-950/30",
-            level === "info" && "bg-eva-bg/80",
             className,
           )}
-          onClick={handleDismiss}
-          onKeyDown={(e) => {
-            if (e.key === "Escape") handleDismiss();
+          style={{
+            backgroundColor: level === "emergency"
+              ? "rgba(10,0,0,0.85)"
+              : level === "caution"
+                ? "rgba(10,6,0,0.8)"
+                : "rgba(0,0,0,0.8)",
           }}
+          onClick={handleDismiss}
+          onKeyDown={(e) => { if (e.key === "Escape") handleDismiss(); }}
           role="alertdialog"
           aria-modal="true"
-          aria-label={`${levelLabel}: ${message}`}
+          aria-label={`${levelText}: ${message}`}
           tabIndex={-1}
         >
-          {/* Chevron bars */}
-          <div className="pointer-events-none absolute inset-x-0 top-0 overflow-hidden">
-            <div
-              className={cn(
-                "flex h-8 gap-4",
-                !reducedMotion && "animate-[scroll-left_4s_linear_infinite]",
-              )}
-            >
-              {Array.from({ length: 20 }).map((_, i) => (
-                <svg
-                  key={i}
-                  viewBox="0 0 24 24"
-                  className={cn(
-                    "h-8 w-8 shrink-0",
-                    level === "emergency" ? "fill-red-500/30" : "fill-amber-500/30",
-                  )}
-                >
-                  <path d="M8 4l8 8-8 8V4z" />
-                </svg>
+          {/* top chevron bar */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-8 overflow-hidden">
+            <div className={cn("flex h-full gap-2", !reducedMotion && "animate-[scroll-left_3s_linear_infinite]")}>
+              {Array.from({ length: 40 }).map((_, i) => (
+                <span key={i} className="inline-block shrink-0 text-lg leading-8" style={{ color: `${alertColor}30` }}>
+                  {"\u25B6"}
+                </span>
               ))}
             </div>
           </div>
 
+          {/* bottom chevron bar */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 overflow-hidden">
+            <div className={cn("flex h-full gap-2", !reducedMotion && "animate-[scroll-right_3s_linear_infinite]")}>
+              {Array.from({ length: 40 }).map((_, i) => (
+                <span key={i} className="inline-block shrink-0 text-lg leading-8" style={{ color: `${alertColor}30` }}>
+                  {"\u25C0"}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* edge lines */}
+          <div className="pointer-events-none absolute inset-y-8 left-0 w-px" style={{ background: `${alertColor}40` }} />
+          <div className="pointer-events-none absolute inset-y-8 right-0 w-px" style={{ background: `${alertColor}40` }} />
+
+          {/* main content */}
           <div
             ref={contentRef}
-            className={cn(
-              "max-w-md border-2 bg-eva-bg/95 p-8 text-center",
-              levelStyles[level],
-            )}
+            className="eva-clip-corner relative max-w-lg border bg-[var(--eva-bg)] p-6"
+            style={{ borderColor: alertColor }}
+            onClick={(e) => e.stopPropagation()}
           >
-            <div data-eva-animate>
-              <GlowText
-                className={cn(
-                  "text-3xl font-bold tracking-widest",
-                  level === "emergency" && "text-red-500",
-                  level === "caution" && "text-amber-500",
-                )}
-                pulse={level === "emergency"}
-                intensity="high"
-              >
-                {levelLabel.toUpperCase()}
-              </GlowText>
+            {/* corner decorations */}
+            <div className="absolute left-2 top-2 text-[8px]" style={{ color: `${alertColor}50` }}>
+              {formatHex(Date.now() % 65535)}
+            </div>
+            <div className="absolute right-2 top-2 text-[8px]" style={{ color: `${alertColor}50` }}>
+              {code ?? "---"}
             </div>
 
-            {code && (
-              <div data-eva-animate className="mt-2">
-                <span className="text-xs tracking-wider text-eva-text-dim">
-                  CODE: {code}
-                </span>
-              </div>
-            )}
+            <div className="space-y-4 pt-3 text-center" data-eva-animate>
+              {/* level label */}
+              <Flicker intensity={level === "emergency" ? "heavy" : "moderate"}>
+                <GlowText
+                  className="text-2xl font-bold tracking-[0.3em]"
+                  pulse={level === "emergency"}
+                  intensity="high"
+                >
+                  <span style={{ color: alertColor }}>{levelText}</span>
+                </GlowText>
+              </Flicker>
+            </div>
 
-            <div data-eva-animate className="mt-4">
+            {/* separator */}
+            <div data-eva-animate className="my-3 h-px" style={{ background: `${alertColor}40` }} />
+
+            {/* message */}
+            <div data-eva-animate>
               <TypeWriter
                 text={message}
-                speed={25}
-                className={cn(
-                  "text-sm",
-                  level === "emergency"
-                    ? "text-red-400"
-                    : level === "caution"
-                      ? "text-amber-400"
-                      : "text-eva-text",
-                )}
+                speed={20}
+                jitter
+                className="text-xs leading-relaxed"
+                cursorChar="_"
               />
             </div>
 
+            {/* dismiss */}
             {dismissible && (
-              <div data-eva-animate className="mt-6">
+              <div data-eva-animate className="mt-5 text-center">
                 <button
-                  className={cn(
-                    "border px-4 py-1 text-xs uppercase tracking-wider",
-                    levelStyles[level],
-                    "hover:bg-eva-surface",
-                  )}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDismiss();
-                  }}
+                  className="eva-clip-corner-sm border px-5 py-1 text-[10px] uppercase tracking-[0.2em] transition-colors hover:bg-[var(--eva-surface)]"
+                  style={{ borderColor: alertColor, color: alertColor }}
+                  onClick={handleDismiss}
                 >
                   DISMISS
                 </button>
               </div>
             )}
-          </div>
-
-          {/* Bottom chevrons */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 overflow-hidden">
-            <div
-              className={cn(
-                "flex h-8 gap-4",
-                !reducedMotion && "animate-[scroll-right_4s_linear_infinite]",
-              )}
-            >
-              {Array.from({ length: 20 }).map((_, i) => (
-                <svg
-                  key={i}
-                  viewBox="0 0 24 24"
-                  className={cn(
-                    "h-8 w-8 shrink-0 rotate-180",
-                    level === "emergency" ? "fill-red-500/30" : "fill-amber-500/30",
-                  )}
-                >
-                  <path d="M8 4l8 8-8 8V4z" />
-                </svg>
-              ))}
-            </div>
           </div>
         </motion.div>
       )}

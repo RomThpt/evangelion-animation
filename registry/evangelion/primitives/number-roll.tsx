@@ -8,6 +8,8 @@ export interface NumberRollProps {
   duration?: number;
   prefix?: string;
   suffix?: string;
+  /** pad with leading zeros (e.g. padTo=3: "007") */
+  padTo?: number;
 }
 
 export function NumberRoll({
@@ -17,19 +19,29 @@ export function NumberRoll({
   duration,
   prefix = "",
   suffix = "",
+  padTo = 0,
 }: NumberRollProps) {
-  const displayValue = useNumberRoll({ value, precision, duration });
+  const raw = useNumberRoll({ value, precision, duration });
+
+  const display = padTo > 0
+    ? raw.split(".").map((part, i) =>
+        i === 0 ? part.padStart(padTo, "0") : part
+      ).join(".")
+    : raw;
 
   return (
     <span
       className={cn(
-        "inline-block font-mono tabular-nums text-eva-text",
+        "eva-value inline-block font-mono tabular-nums text-eva-text",
         className,
       )}
+      style={{
+        textShadow: "0 0 2px var(--eva-glow), 0 0 6px var(--eva-glow-subtle, var(--eva-glow))",
+      }}
     >
-      {prefix}
-      {displayValue}
-      {suffix}
+      {prefix && <span className="text-eva-text-dim">{prefix}</span>}
+      {display}
+      {suffix && <span className="ml-[0.15em] text-[0.7em] text-eva-text-dim">{suffix}</span>}
     </span>
   );
 }
