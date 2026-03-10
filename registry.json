@@ -1,0 +1,325 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "evangelion",
+  "homepage": "https://evangelion-ui.dev",
+  "items": [
+    {
+      "name": "eva-provider",
+      "type": "registry:component",
+      "title": "EvaProvider",
+      "description": "Theme provider with palette, locale, and animation controls",
+      "files": [
+        { "path": "registry/evangelion/provider/eva-provider.tsx", "type": "registry:component" },
+        { "path": "registry/evangelion/provider/eva-context.ts", "type": "registry:lib" },
+        { "path": "registry/evangelion/provider/themes.ts", "type": "registry:lib" },
+        { "path": "registry/evangelion/provider/types.ts", "type": "registry:lib" }
+      ],
+      "dependencies": ["clsx", "tailwind-merge"]
+    },
+    {
+      "name": "scanlines",
+      "type": "registry:component",
+      "title": "Scanlines",
+      "description": "CRT scanline overlay effect",
+      "registryDependencies": ["eva-provider", "utils"],
+      "files": [
+        { "path": "registry/evangelion/primitives/scanlines.tsx", "type": "registry:component" }
+      ]
+    },
+    {
+      "name": "flicker",
+      "type": "registry:component",
+      "title": "Flicker",
+      "description": "Random opacity flicker animation wrapper",
+      "registryDependencies": ["eva-provider", "utils", "use-flicker"],
+      "files": [
+        { "path": "registry/evangelion/primitives/flicker.tsx", "type": "registry:component" }
+      ]
+    },
+    {
+      "name": "glow-text",
+      "type": "registry:component",
+      "title": "GlowText",
+      "description": "Text with configurable glow effect",
+      "registryDependencies": ["utils"],
+      "files": [
+        { "path": "registry/evangelion/primitives/glow-text.tsx", "type": "registry:component" }
+      ]
+    },
+    {
+      "name": "type-writer",
+      "type": "registry:component",
+      "title": "TypeWriter",
+      "description": "Character-by-character typewriter text reveal",
+      "registryDependencies": ["eva-provider", "utils"],
+      "dependencies": ["animejs"],
+      "files": [
+        { "path": "registry/evangelion/primitives/type-writer.tsx", "type": "registry:component" }
+      ]
+    },
+    {
+      "name": "number-roll",
+      "type": "registry:component",
+      "title": "NumberRoll",
+      "description": "Odometer-style animated number display",
+      "registryDependencies": ["eva-provider", "utils", "use-number-roll"],
+      "dependencies": ["animejs"],
+      "files": [
+        { "path": "registry/evangelion/primitives/number-roll.tsx", "type": "registry:component" }
+      ]
+    },
+    {
+      "name": "utils",
+      "type": "registry:lib",
+      "title": "Utilities",
+      "description": "cn() utility and shared helpers",
+      "dependencies": ["clsx", "tailwind-merge"],
+      "files": [
+        { "path": "registry/evangelion/lib/utils.ts", "type": "registry:lib" }
+      ]
+    },
+    {
+      "name": "i18n",
+      "type": "registry:lib",
+      "title": "i18n",
+      "description": "Internationalization helpers and label maps",
+      "registryDependencies": ["eva-provider"],
+      "files": [
+        { "path": "registry/evangelion/lib/i18n.ts", "type": "registry:lib" }
+      ]
+    },
+    {
+      "name": "animation-presets",
+      "type": "registry:lib",
+      "title": "Animation Presets",
+      "description": "Shared timing and easing configurations",
+      "files": [
+        { "path": "registry/evangelion/lib/animation-presets.ts", "type": "registry:lib" }
+      ]
+    },
+    {
+      "name": "colors",
+      "type": "registry:lib",
+      "title": "Colors",
+      "description": "Color utilities for Canvas rendering",
+      "registryDependencies": ["eva-provider"],
+      "files": [
+        { "path": "registry/evangelion/lib/colors.ts", "type": "registry:lib" }
+      ]
+    },
+    {
+      "name": "use-eva-animation",
+      "type": "registry:hook",
+      "title": "useEvaAnimation",
+      "description": "anime.js scope management hook",
+      "registryDependencies": ["eva-provider"],
+      "dependencies": ["animejs"],
+      "files": [
+        { "path": "registry/evangelion/hooks/use-eva-animation.ts", "type": "registry:hook" }
+      ]
+    },
+    {
+      "name": "use-palette",
+      "type": "registry:hook",
+      "title": "usePalette",
+      "description": "Palette access and transition hook",
+      "registryDependencies": ["eva-provider"],
+      "files": [
+        { "path": "registry/evangelion/hooks/use-palette.ts", "type": "registry:hook" }
+      ]
+    },
+    {
+      "name": "use-flicker",
+      "type": "registry:hook",
+      "title": "useFlicker",
+      "description": "RAF-based random flicker animation hook",
+      "registryDependencies": ["eva-provider"],
+      "files": [
+        { "path": "registry/evangelion/hooks/use-flicker.ts", "type": "registry:hook" }
+      ]
+    },
+    {
+      "name": "use-number-roll",
+      "type": "registry:hook",
+      "title": "useNumberRoll",
+      "description": "Animated number rolling hook",
+      "registryDependencies": ["eva-provider", "animation-presets"],
+      "dependencies": ["animejs"],
+      "files": [
+        { "path": "registry/evangelion/hooks/use-number-roll.ts", "type": "registry:hook" }
+      ]
+    },
+    {
+      "name": "use-reduced-motion",
+      "type": "registry:hook",
+      "title": "useReducedMotion",
+      "description": "Prefers-reduced-motion media query hook",
+      "files": [
+        { "path": "registry/evangelion/hooks/use-reduced-motion.ts", "type": "registry:hook" }
+      ]
+    },
+    {
+      "name": "status-panel",
+      "type": "registry:component",
+      "title": "StatusPanel",
+      "description": "Bordered panel container with header, status indicator, and collapsible content",
+      "registryDependencies": ["eva-provider", "utils", "type-writer", "scanlines", "animation-presets"],
+      "dependencies": ["animejs", "framer-motion"],
+      "files": [
+        { "path": "registry/evangelion/components/status-panel.tsx", "type": "registry:component" }
+      ]
+    },
+    {
+      "name": "sync-gauge",
+      "type": "registry:component",
+      "title": "SyncGauge",
+      "description": "Circular gauge showing synchronization rate with threshold animations",
+      "registryDependencies": ["eva-provider", "utils", "number-roll", "glow-text", "i18n", "animation-presets"],
+      "dependencies": ["animejs", "framer-motion"],
+      "files": [
+        { "path": "registry/evangelion/components/sync-gauge.tsx", "type": "registry:component" }
+      ]
+    },
+    {
+      "name": "alert-overlay",
+      "type": "registry:component",
+      "title": "AlertOverlay",
+      "description": "Full-screen emergency alert overlay with chevron patterns",
+      "registryDependencies": ["eva-provider", "utils", "glow-text", "type-writer", "i18n", "animation-presets"],
+      "dependencies": ["animejs", "framer-motion"],
+      "files": [
+        { "path": "registry/evangelion/components/alert-overlay.tsx", "type": "registry:component" }
+      ]
+    },
+    {
+      "name": "data-readout",
+      "type": "registry:component",
+      "title": "DataReadout",
+      "description": "Compact numeric readout with label, value, unit, and trend indicator",
+      "registryDependencies": ["eva-provider", "utils", "number-roll", "glow-text", "animation-presets"],
+      "dependencies": ["animejs"],
+      "files": [
+        { "path": "registry/evangelion/components/data-readout.tsx", "type": "registry:component" }
+      ]
+    },
+    {
+      "name": "progress-bar",
+      "type": "registry:component",
+      "title": "ProgressBar",
+      "description": "Segmented progress bar with staggered fill animation",
+      "registryDependencies": ["eva-provider", "utils", "number-roll", "glow-text", "animation-presets"],
+      "dependencies": ["animejs"],
+      "files": [
+        { "path": "registry/evangelion/components/progress-bar.tsx", "type": "registry:component" }
+      ]
+    },
+    {
+      "name": "waveform-display",
+      "type": "registry:component",
+      "title": "WaveformDisplay",
+      "description": "Canvas-based animated waveform/oscilloscope display",
+      "registryDependencies": ["eva-provider", "utils", "glow-text", "colors"],
+      "files": [
+        { "path": "registry/evangelion/components/waveform-display.tsx", "type": "registry:component" }
+      ]
+    },
+    {
+      "name": "hex-grid",
+      "type": "registry:component",
+      "title": "HexGrid",
+      "description": "SVG hexagonal grid with staggered mount and click interaction",
+      "registryDependencies": ["eva-provider", "utils", "animation-presets"],
+      "dependencies": ["animejs"],
+      "files": [
+        { "path": "registry/evangelion/components/hex-grid.tsx", "type": "registry:component" }
+      ]
+    },
+    {
+      "name": "target-reticle",
+      "type": "registry:component",
+      "title": "TargetReticle",
+      "description": "SVG crosshair/targeting overlay with lock-on animation",
+      "registryDependencies": ["eva-provider", "utils", "number-roll", "glow-text", "animation-presets"],
+      "dependencies": ["animejs", "framer-motion"],
+      "files": [
+        { "path": "registry/evangelion/components/target-reticle.tsx", "type": "registry:component" }
+      ]
+    },
+    {
+      "name": "at-field-diagram",
+      "type": "registry:component",
+      "title": "ATFieldDiagram",
+      "description": "Octagonal AT Field strength diagram with sector breakdown",
+      "registryDependencies": ["eva-provider", "utils", "number-roll", "glow-text", "animation-presets"],
+      "dependencies": ["animejs"],
+      "files": [
+        { "path": "registry/evangelion/components/at-field-diagram.tsx", "type": "registry:component" }
+      ]
+    },
+    {
+      "name": "countdown-timer",
+      "type": "registry:component",
+      "title": "CountdownTimer",
+      "description": "Large countdown display with threshold color transitions",
+      "registryDependencies": ["eva-provider", "utils", "number-roll", "glow-text"],
+      "files": [
+        { "path": "registry/evangelion/components/countdown-timer.tsx", "type": "registry:component" }
+      ]
+    },
+    {
+      "name": "system-log",
+      "type": "registry:component",
+      "title": "SystemLog",
+      "description": "Scrolling terminal-style log feed with typewriter entry animation",
+      "registryDependencies": ["eva-provider", "utils", "type-writer"],
+      "dependencies": ["framer-motion"],
+      "files": [
+        { "path": "registry/evangelion/components/system-log.tsx", "type": "registry:component" }
+      ]
+    },
+    {
+      "name": "pattern-alert",
+      "type": "registry:component",
+      "title": "PatternAlert",
+      "description": "Pattern detection notification with confidence meter and confirmation",
+      "registryDependencies": ["eva-provider", "utils", "type-writer", "number-roll", "glow-text", "i18n", "animation-presets"],
+      "dependencies": ["animejs", "framer-motion"],
+      "files": [
+        { "path": "registry/evangelion/components/pattern-alert.tsx", "type": "registry:component" }
+      ]
+    },
+    {
+      "name": "pilot-status",
+      "type": "registry:component",
+      "title": "PilotStatus",
+      "description": "Composite pilot status card with sync gauge, vitals, and waveform",
+      "registryDependencies": ["eva-provider", "utils", "sync-gauge", "waveform-display", "progress-bar", "number-roll", "glow-text", "i18n"],
+      "dependencies": ["framer-motion"],
+      "files": [
+        { "path": "registry/evangelion/components/pilot-status.tsx", "type": "registry:component" }
+      ]
+    },
+    {
+      "name": "map-overlay",
+      "type": "registry:component",
+      "title": "MapOverlay",
+      "description": "Canvas tactical map with grid, markers, and range circles",
+      "registryDependencies": ["eva-provider", "utils", "glow-text", "colors"],
+      "dependencies": ["framer-motion"],
+      "files": [
+        { "path": "registry/evangelion/components/map-overlay.tsx", "type": "registry:component" }
+      ]
+    },
+    {
+      "name": "entry-plug-hud",
+      "type": "registry:component",
+      "title": "EntryPlugHUD",
+      "description": "Composite full-screen HUD overlay with boot sequence animation",
+      "registryDependencies": ["eva-provider", "utils", "target-reticle", "data-readout", "waveform-display", "sync-gauge", "scanlines", "glow-text", "animation-presets"],
+      "dependencies": ["animejs", "framer-motion"],
+      "files": [
+        { "path": "registry/evangelion/components/entry-plug-hud.tsx", "type": "registry:component" }
+      ]
+    }
+  ]
+}
