@@ -2,7 +2,34 @@
 
 A shadcn-style React component library with authentic Evangelion HUD aesthetics. Components are copied into your project, fully customizable, and animated with Framer Motion and anime.js v4.
 
-https://github.com/user-attachments/assets/preview.mp4
+## Gallery
+
+<table>
+<tr>
+<td align="center"><strong>MAGI Consensus</strong><br/><img src="docs/screenshots/magi-consensus.png" width="380" alt="MAGI Consensus" /></td>
+<td align="center"><strong>Radar Sweep</strong><br/><img src="docs/screenshots/radar-sweep.png" width="240" alt="Radar Sweep" /></td>
+</tr>
+<tr>
+<td align="center"><strong>Spectrum Analyzer</strong><br/><img src="docs/screenshots/spectrum-analyzer.png" width="380" alt="Spectrum Analyzer" /></td>
+<td align="center"><strong>Pattern Alert</strong><br/><img src="docs/screenshots/pattern-alert.png" width="240" alt="Pattern Alert" /></td>
+</tr>
+<tr>
+<td align="center"><strong>Command Terminal</strong><br/><img src="docs/screenshots/command-terminal.png" width="380" alt="Command Terminal" /></td>
+<td align="center"><strong>Sync Gauge</strong><br/><img src="docs/screenshots/sync-gauge.png" width="190" alt="Sync Gauge" /></td>
+</tr>
+<tr>
+<td align="center"><strong>Camera Feed</strong><br/><img src="docs/screenshots/camera-feed.png" width="380" alt="Camera Feed" /></td>
+<td align="center"><strong>LCL Depth Meter</strong><br/><img src="docs/screenshots/lcl-depth-meter.png" width="145" alt="LCL Depth Meter" /></td>
+</tr>
+<tr>
+<td align="center"><strong>Power Grid</strong><br/><img src="docs/screenshots/power-grid.png" width="380" alt="Power Grid" /></td>
+<td align="center"><strong>Waveform Display</strong><br/><img src="docs/screenshots/waveform-display.png" width="240" alt="Waveform Display" /></td>
+</tr>
+<tr>
+<td align="center"><strong>Notification Banner</strong><br/><img src="docs/screenshots/notification-banner.png" width="380" alt="Notification Banner" /></td>
+<td align="center"><strong>Status Panel</strong><br/><img src="docs/screenshots/status-panel.png" width="240" alt="Status Panel" /></td>
+</tr>
+</table>
 
 ## Tech Stack
 

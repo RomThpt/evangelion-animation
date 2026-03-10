@@ -38,6 +38,7 @@
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
     "jsdom": "^26.1.0",
+    "puppeteer": "^24.39.0",
     "storybook": "^10.2.17",
     "tailwindcss": "^4.1.8",
     "typescript": "~5.9.3",
