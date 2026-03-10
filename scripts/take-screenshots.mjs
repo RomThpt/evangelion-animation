@@ -15,7 +15,7 @@ const shots = [
   { name: "power-grid", id: "components-powergrid--with-battery", w: 800, h: 300 },
   { name: "lcl-depth-meter", id: "components-lcldepthmeter--contaminated", w: 300, h: 550 },
   { name: "pattern-alert", id: "components-patternalert--blue-pattern", w: 500, h: 400 },
-  { name: "status-panel", id: "components-statuspanel--default", w: 500, h: 300 },
+  { name: "status-panel", id: "components-statuspanel--online", w: 500, h: 300 },
   { name: "waveform-display", id: "components-waveformdisplay--sine", w: 500, h: 200 },
   { name: "sync-gauge", id: "components-syncgauge--default", w: 400, h: 400 },
 ];
